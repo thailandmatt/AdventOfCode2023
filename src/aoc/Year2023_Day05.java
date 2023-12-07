@@ -42,7 +42,7 @@ public class Year2023_Day05 extends Base<ArrayList<String>> {
 
         public LongRange(Long start, Long end) {
             this.start = start;
-            this.length = end - start;
+            this.length = end - start + 1;
             this.end = end;
         }
     }
@@ -133,7 +133,7 @@ public class Year2023_Day05 extends Base<ArrayList<String>> {
         }
 
         //split the ranges all the way through
-        for (int i = 1; i < maps.size(); i++) {
+        for (int i = 0; i < maps.size(); i++) {
             //split
             List<LongRange> newTargetRanges = new ArrayList<>();
             for (var t: targetRanges) {
@@ -142,47 +142,55 @@ public class Year2023_Day05 extends Base<ArrayList<String>> {
                 //find all overlapping ones and deal with them
                 var overlapping = maps.get(i).stream().filter(x -> {
                     return
-                    (x.destinationStart <= t.start && x.destinationEnd >= t.start && x.destinationEnd <= t.end) ||
-                    (t.start <= x.destinationStart && t.end >= x.destinationStart && t.end <= x.destinationEnd) ||
-                    (t.start <= x.destinationStart && t.end >= x.destinationEnd) ||
-                    (x.destinationStart <= t.start && x.destinationEnd >= t.end);
+                    (x.sourceStart <= t.start && x.sourceEnd >= t.start && x.sourceEnd <= t.end) ||
+                    (t.start <= x.sourceStart && t.end >= x.sourceStart && t.end <= x.sourceEnd) ||
+                    (t.start <= x.sourceStart && t.end >= x.sourceEnd) ||
+                    (x.sourceStart <= t.start && x.sourceEnd >= t.end);
                 }).toList();
 
                 if (overlapping.size() == 0) {
                     newTargetRanges.add(t);
                 } else {
                     for (var x: overlapping) {
-                        if (x.destinationStart <= t.start && x.destinationEnd >= t.start && x.destinationEnd <= t.end) {
-                            newTargetRanges.add(new LongRange(x.destinationStart, t.start - 1));
-                            newTargetRanges.add(new LongRange(t.start, x.destinationEnd));
-                            newTargetRanges.add(new LongRange(x.destinationEnd + 1, t.end));
+                        if (x.sourceStart <= t.start && x.sourceEnd >= t.start && x.sourceEnd <= t.end) {                            
+                            newTargetRanges.add(new LongRange(t.start, x.sourceEnd));
+                            newTargetRanges.add(new LongRange(x.sourceEnd + 1, t.end));
 
-                        } else if (t.start <= x.destinationStart && t.end >= x.destinationStart && t.end <= x.destinationEnd) {
-                            newTargetRanges.add(new LongRange(t.start, x.destinationStart - 1));
-                            newTargetRanges.add(new LongRange(x.destinationStart, t.end));
-                            newTargetRanges.add(new LongRange(t.end + 1, x.destinationEnd));
+                        } else if (t.start <= x.sourceStart && t.end >= x.sourceStart && t.end <= x.sourceEnd) {
+                            newTargetRanges.add(new LongRange(t.start, x.sourceStart - 1));
+                            newTargetRanges.add(new LongRange(x.sourceStart, t.end));                            
 
-                        } else if (t.start <= x.destinationStart && t.end >= x.destinationEnd) {
-                            newTargetRanges.add(new LongRange(t.start, x.destinationStart - 1));
-                            newTargetRanges.add(new LongRange(x.destinationStart, x.destinationEnd));
-                            newTargetRanges.add(new LongRange(x.destinationEnd + 1, t.end));
+                        } else if (t.start <= x.sourceStart && t.end >= x.sourceEnd) {
+                            newTargetRanges.add(new LongRange(t.start, x.sourceStart - 1));
+                            newTargetRanges.add(new LongRange(x.sourceStart, x.sourceEnd));
+                            newTargetRanges.add(new LongRange(x.sourceEnd + 1, t.end));
 
-                        } else if (x.destinationStart <= t.start && x.destinationEnd >= t.end) {
-                            newTargetRanges.add(new LongRange(x.destinationStart, t.start - 1));
-                            newTargetRanges.add(new LongRange(t.start, t.end));
-                            newTargetRanges.add(new LongRange(t.end + 1, x.destinationEnd));
+                        } else if (x.sourceStart <= t.start && x.sourceEnd >= t.end) {                            
+                            newTargetRanges.add(new LongRange(t.start, t.end));                            
                         }
                     }
                 }
             }
 
             //mutate
+            List<LongRange> mutatedRanges = new ArrayList<>();
             for (var t: newTargetRanges) {
-                //maps.get(i).stream().findFirst(x -> x.
+                var mutation = maps.get(i).stream().filter(x -> x.sourceStart <= t.start && x.sourceEnd >= t.end).findFirst();
+                if (mutation.isPresent()) {
+                    var diff = mutation.get().destinationStart - mutation.get().sourceStart;
+                    mutatedRanges.add(new LongRange(t.start + diff, t.end + diff));
+                } else {
+                    mutatedRanges.add(t);
+                }
             }
+
+            targetRanges = mutatedRanges;
+            targetRanges.sort((a, b) -> a.start.compareTo(b.start));
         }
 
+        var answer = targetRanges.stream().mapToLong(x -> x.start).min().getAsLong();
+
         // print out the result
-        System.out.printf("Part 2: %d\n", 0);
+        System.out.printf("Part 2: %d\n", answer);
     }
 }
