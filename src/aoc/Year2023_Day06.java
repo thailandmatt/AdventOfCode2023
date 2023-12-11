@@ -57,11 +57,14 @@ public class Year2023_Day06 extends Base<ArrayList<String>> {
         // print out the result
         System.out.printf("Part 1: %d\n", winCounts.stream().reduce(1, (a, b) -> a * b));
     }
+    long ceilDiv(long x, long y){
+        return -Math.floorDiv(-x,y);
+    }
 
     void part2() {
         Long time = parseLong(processed.get(0).replace(" ", "").replace("Time:", ""));
         Long distance = parseLong(processed.get(1).replace(" ", "").replace("Distance:", ""));
-        var lowerBound = Math.ceilDiv(distance, time);
+        var lowerBound = ceilDiv(distance, time);
         for (int i = 0; i < time; i++) {
             if (i * (time - i) > distance) {
                 lowerBound = i;

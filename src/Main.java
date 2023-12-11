@@ -7,9 +7,10 @@ import aoc.Year2023_Day06;
 import aoc.Year2023_Day07;
 import aoc.Year2023_Day08;
 import aoc.Year2023_Day09;
+import aoc.Year2023_Day11;
 
 public class Main {
     public static void main(String[] args) {
-        new Year2023_Day09().run(true);
+        new Year2023_Day11().run(true);
     }
 }
