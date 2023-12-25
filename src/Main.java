@@ -22,9 +22,10 @@ import aoc.Year2023_Day21;
 import aoc.Year2023_Day22;
 import aoc.Year2023_Day23;
 import aoc.Year2023_Day24;
+import aoc.Year2023_Day25;
 
 public class Main {
     public static void main(String[] args) {
-        new Year2023_Day24().run(true);
+        new Year2023_Day25().run(true);
     }
 }
